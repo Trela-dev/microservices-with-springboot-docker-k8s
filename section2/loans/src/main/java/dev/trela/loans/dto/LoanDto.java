@@ -1,9 +1,7 @@
 package dev.trela.loans.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 
 @Schema(
         name  = "Loans",
@@ -33,20 +31,23 @@ public record LoanDto(
         )
         String loanType,
 
-        @NotNull(message = "Total loan is required")
+        @Positive(message = "Total loan amount should be greater than zero")
         @Schema(
                 description = "Total loan of TrelaBank account holder",
                 example = "100000"
         )
         int totalLoan,
 
-        @NotNull(message = "Amount paid is required")
+        @Schema(
+                description = "Amount paid by TrelaBank account holder",
+                example = "50000")
+        @PositiveOrZero(message = "Amount paid is required")
         int amountPaid,
 
         @Schema(
                 description = "Outstanding amount of TrelaBank account holder",
                 example = "50000"
         )
-        @NotNull(message = "Outstanding amount is required")
+        @PositiveOrZero(message = "Outstanding amount is required")
         int outstandingAmount) {
 }
