@@ -1,9 +1,7 @@
 package dev.trela.accounts.controller;
 
 import dev.trela.accounts.constants.AccountsConstants;
-import dev.trela.accounts.dto.CustomerDto;
-import dev.trela.accounts.dto.ErrorResponseDto;
-import dev.trela.accounts.dto.ResponseDto;
+
 import dev.trela.accounts.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,7 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
+import dev.trela.accounts.dto.*;
 
 //Tag for Swagger documentation
 @Tag(

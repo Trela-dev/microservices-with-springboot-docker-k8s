@@ -1,4 +1,4 @@
-package dev.trela.cards;
+package dev.trela.loans;
 
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -13,11 +13,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing(auditorAwareRef = "auditAwareImpl")
 @OpenAPIDefinition(
 		info = @Info(
-				title = "Cards microservice RESTAPI documentation",
-				description = "TrelaDev Cards microservice REST API documentation",
+				title = "Loans microservice REST API documentation",
+				description = "TrelaDev Loans microservice REST API documentation",
 				version = "V1",
 				contact = @Contact(
-						name = "Marcin Trela",
+						name ="Marcin Trela",
 						email = "marcin.trela.dev@gmail.com",
 						url = "https://github.com/Trela-dev"
 				),
@@ -25,14 +25,18 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 						name = "Apache 2.0",
 						url = "https://github.com/Trela-dev"
 				)
+
 		),
 		externalDocs = @ExternalDocumentation(
-				description = "TrelaDev Accounts microservice REST API Documentation",
-				url = "https://github.com/Trela-de"
+		description = "TrelaDev Loans microservice RESTAPI documentation",
+				url = "https://github.com/Trela-dev"
+
 )
 )
-public class CardsApplication {
+public class LoansApplication {
+
 	public static void main(String[] args) {
-		SpringApplication.run(CardsApplication.class, args);
+		SpringApplication.run(LoansApplication.class, args);
 	}
+
 }

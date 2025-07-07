@@ -1,4 +1,4 @@
-package dev.trela.cards.dto;
+package dev.trela.loans.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatus;
@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 
 @Schema(
-        name = "Error Response",
-        description = "Schema to hold error response information"
+        name = "ErrorResponseDto",
+        description = "Error Response Dto"
 )
 public record ErrorResponseDto(
         @Schema(

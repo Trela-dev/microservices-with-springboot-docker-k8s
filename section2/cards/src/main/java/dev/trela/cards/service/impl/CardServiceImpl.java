@@ -24,7 +24,7 @@ public class CardServiceImpl implements CardsService {
     @Override
     public CardsDto createCard(String mobileNumber) {
         if(cardsRepository.findByMobileNumber(mobileNumber).isPresent()){
-            throw new CardAlreadyExistsException("Card already registered with given mobileNumber",mobileNumber);
+            throw new CardAlreadyExistsException("Card already registered with given mobileNumber ",mobileNumber);
         }
         return CardsMapper.mapToCardsDto(cardsRepository.save(createNewCard(mobileNumber)));
     }

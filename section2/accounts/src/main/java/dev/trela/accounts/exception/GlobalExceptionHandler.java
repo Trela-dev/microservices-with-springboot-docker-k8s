@@ -45,7 +45,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
-    // dodal exception handler for all other exceptions
+    // exception handler for all other exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleAllDifferentExceptions(Exception exception, WebRequest webRequest){
         ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
