@@ -41,13 +41,13 @@ public record LoanDto(
         @Schema(
                 description = "Amount paid by TrelaBank account holder",
                 example = "50000")
-        @PositiveOrZero(message = "Amount paid is required")
+        @PositiveOrZero(message = "Amount paid has to be greater than or equal to zero")
         int amountPaid,
 
         @Schema(
                 description = "Outstanding amount of TrelaBank account holder",
                 example = "50000"
         )
-        @PositiveOrZero(message = "Outstanding amount is required")
+        @PositiveOrZero(message = "Outstanding amount has to be greater than or equal to zero")
         int outstandingAmount) {
 }
