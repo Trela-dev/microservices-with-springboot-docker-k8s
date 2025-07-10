@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+
+
+build:
+  version: "2.0"
+
+accounts:
+  message: "Welcome to TrelaBank accounts related prod APIs"
+  contactDetails:
+    name: "Example prod Contact"
+    email: "example.prod.contact@gmail.com"
+  onCallSupport:
+    - (123) 456-7890
+    - (123) 523-7890

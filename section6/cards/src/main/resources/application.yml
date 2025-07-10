@@ -1,0 +1,39 @@
+server:
+  port: 9000
+spring:
+  application:
+    name: cards
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ''
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  devtools:
+    restart:
+      enabled: true
+  config:
+    import:
+      - "application_qa.yml"
+      - "application_prod.yml"
+  profiles:
+    active: prod
+
+build:
+  version: "3.0"
+
+cards:
+    message: "Welcome to TrelaBank cards related local APIs"
+    contactDetails:
+      name: "Marcin Trela Developer"
+      email: "marcin.trela.dev@gmail.com"
+    onCallSupport:
+      - (123) 456-7890
+      - (123) 523-7890
