@@ -1,0 +1,16 @@
+spring:
+  config:
+    activate:
+      on-profile: "qa"
+build:
+  version: "4.0"
+
+
+loans:
+  message: "Welcome to TrelaBank loansrelated QA APIs"
+  contactDetails:
+    name: "Example QA Contact"
+    email: "example.qa.contact@gmail.com"
+  onCallSupport:
+    - (123) 456-7890
+    - (123) 523-7890

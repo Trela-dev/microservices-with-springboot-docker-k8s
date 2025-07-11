@@ -1,0 +1,40 @@
+services:
+  accounts:
+    image: "treladev/accounts:s4"
+    container_name: accounts
+    ports:
+      - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - trelabank
+  loans:
+    image: "treladev/loans:s4"
+    container_name: loans
+    ports:
+      - "8090:8090"
+    deploy:
+      resources:
+         limits:
+          memory: 700m
+    networks:
+      - trelabank
+  cards:
+    image: "treladev/cards:s4"
+    container_name: cards
+    ports:
+      - "9000:9000"
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - trelabank
+
+networks:
+  trelabank:
+    driver: bridge
+
+

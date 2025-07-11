@@ -1,0 +1,12 @@
+build:
+  version: "2.5"
+
+loans:
+  message: "Welcome to TrelaBank loans related APIs"
+  contactDetails:
+    name: "Marcin Trela Developer"
+    email: "marcin.trela.developer@gmailcom"
+  onCallSupport:
+    - (123) 456-7890
+    - (123) 523-7890
+
