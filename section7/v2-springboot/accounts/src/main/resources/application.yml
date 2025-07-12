@@ -1,0 +1,30 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: accounts
+  profiles:
+    #we change profile and get different api repsponses from config server
+    active: "qa"
+  datasource:
+    url: jdbc:mysql://localhost:3306/accountsdb
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  config:
+#    optional is given when we someteime dont need config server
+    import: "optional:configserver:http://localhost:8071/"
+
+
+# allow all management endpoints  we want actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+
+

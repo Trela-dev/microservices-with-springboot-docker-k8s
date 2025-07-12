@@ -1,58 +1,31 @@
 services:
-  
-  rabbit:
-    image: rabbitmq:3.12-management
-    hostname: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    healthcheck:
-      test: rabbitmq-disagnostics check_port_connectivity
-      interval: 10s
-      timeout 5s
-
-  
-  
-  
   accounts:
     image: "treladev/accounts:s4"
     container_name: accounts
     ports:
       - "8080:8080"
-    depends_on:
-      configserver:
-        condition: service_healthy
     deploy:
       resources:
         limits:
           memory: 700m
     networks:
       - trelabank
-
   loans:
     image: "treladev/loans:s4"
     container_name: loans
     ports:
       - "8090:8090"
-    depends_on:
-      configserver:
-        condition: service_healthy
     deploy:
       resources:
          limits:
           memory: 700m
     networks:
       - trelabank
-
-
   cards:
     image: "treladev/cards:s4"
     container_name: cards
     ports:
       - "9000:9000"
-    depends_on:
-      configserver:
-        condition: service_healthy
     deploy:
       resources:
         limits:

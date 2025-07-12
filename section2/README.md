@@ -4,6 +4,16 @@ This section was the first hands-on part of the course [Master Microservices wit
 
 ---
 
+---
+
+# Section 2: First Hands-On Microservices Project
+
+## Building foundational microservices with Spring Boot, featuring full CRUD APIs, validation, error handling, and API documentation.
+
+
+This section provides a theoretical introduction to Cloud Native concepts and principles without any coding examples. Cloud Native is an approach to building applications that fully leverage cloud computing by focusing on scalability, resilience, and efficient deployment using modern practices and tools.
+
+---
 ### 📌 What I learned
 
 #### 🔧 Microservices Fundamentals

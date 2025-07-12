@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: configserver
+  profiles:
+    #active: native #<-- file approach
+    active: git
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Trela-dev/trelabank-config.git
+        default-label: main
+        timeout: 5
+        clone-on-start: true
+        force-pull: true
+
+#key to encrypt
+encrypt:
+  key: "V-6hQYD?w0QgedUy"
+
+
+
+server:
+  port: 8071
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true

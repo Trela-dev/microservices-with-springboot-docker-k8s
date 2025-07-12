@@ -1,5 +1,13 @@
 
+---
 
+# Section 5: Overview & Key Concepts
+
+## Overview
+
+This section provides a theoretical introduction to Cloud Native concepts and principles without any coding examples. Cloud Native is an approach to building applications that fully leverage cloud computing by focusing on scalability, resilience, and efficient deployment using modern practices and tools.
+
+---
 ## 🌩️ Cloud Native — Theory & Principles
 
 ### 🔍 What is Cloud Native?

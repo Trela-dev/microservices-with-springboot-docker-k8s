@@ -521,7 +521,7 @@ With **Ngrok**, you map your local service to a public URL.
 Example:
 
 ```bash
-ngrok http 8080
+ngrok http http://localhost:8080
 ```
 
 Ngrok will generate a public URL like:
@@ -552,3 +552,215 @@ Now, whenever you push a change to the config repo on GitHub:
 * Every instance gets updated **automatically**
 
 ---
+
+Now we need to containerize our entire application.
+The property:
+
+```
+import: "optional:configserver:http://localhost:8071/"
+```
+
+cannot use `localhost` inside containers because they run in an isolated network and have different hostnames.
+
+Therefore, we add the following environment variables:
+
+```yaml
+environment:
+  # the spring.config.import property will be changed through env variable
+  SPRING_APPLICATION_NAME: accounts
+  SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
+  SPRING_PROFILES_ACTIVE: default
+```
+
+Besides that, we need to address another challenge:
+We want the config server to always start before the services, so we need a way to check whether the container is alive and ready to work.
+For this, we need to understand two new concepts: **liveness** and **readiness**.
+
+* **Liveness** means that the container is running, but maybe the application inside is still starting up.
+* In that case, we also need **readiness**.
+
+If the config server has both liveness and readiness, then we should start other services after it is ready.
+Spring Boot Actuator has endpoints to check liveness and readiness:
+
+```
+/actuator/health/liveness
+/actuator/health/readiness
+```
+
+So, we add this to our config server’s application.yml:
+
+```yaml
+health:
+  readiness-state:
+    enabled: true
+  liveness-state:
+    enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+```
+
+This enables the health, readiness, and liveness endpoints:
+`http://localhost:8071/actuator/health/liveness`
+`http://localhost:8071/actuator/health/readiness`
+
+---
+
+Next, in the docker-compose for configserver, we add:
+
+```yaml
+healthcheck:
+  test: "curl --fail --silent localhost:8071/actuator/health | grep UP || exit 1"
+  interval: 10s
+  timeout: 5s
+  retries: 10
+  start_period: 10s
+```
+
+This means that if `--fail` happens, exit code 1 is returned; otherwise, if `grep` finds "UP", the exit code is 0.
+
+`grep` stands for:
+**Global Regular Expression Print** —
+which means: find and print lines of text that match a pattern
+(e.g. contain a certain word or regex).
+
+---
+
+We also need to add in other services that they depend on the config server:
+
+```yaml
+depends_on:
+  configserver:
+    condition: service_healthy
+```
+
+And we must add RabbitMQ as well:
+
+```yaml
+rabbit:
+  image: rabbitmq:3.12-management
+  hostname: rabbitmq
+  ports:
+    - "5672:5672"
+    - "15672:15672"
+  healthcheck:
+    test: rabbitmq-diagnostics check_port_connectivity
+    interval: 10s
+    timeout: 5s
+    retries: 10
+    start_period: 10s
+```
+
+---
+
+Now let’s optimize our docker-compose to separate repeated configuration:
+
+We create **common-config.yml** where we analyze the common/repeated configuration in docker-compose and move it there:
+
+```yaml
+# Separation of common configs from docker-compose
+services:
+  # All services
+  network-deploy-service:
+    networks:
+      - trelabank
+  # All services except rabbit
+  microservice-base-config:
+    extends:
+      service: network-deploy-service
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+
+  microservice-configserver-config:
+    extends:
+      service: microservice-base-config
+    depends_on:
+      configserver:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+```
+
+We then import this into our docker-compose.yml.
+
+For example, instead of repeating networks in rabbit, we import it from common-config.yml:
+
+```yaml
+rabbit:
+  image: rabbitmq:3.12-management
+  hostname: rabbitmq
+  ports:
+    - "5672:5672"
+    - "15672:15672"
+  healthcheck:
+    test: rabbitmq-diagnostics check_port_connectivity
+    interval: 10s
+    timeout: 5s
+    retries: 10
+    start_period: 10s
+  extends:
+    file: common-config.yml
+    service: network-deploy-service
+```
+
+Similarly for other services — the key is that `extends` defines which configurations are combined.
+If we extend a service that itself extends others, we can chain multiple imports (like 3 in a row).
+
+---
+
+👉 Your thought is correct:
+*“using common config increases complexity because you have to look into two files”* — yes, that’s true. But sometimes it’s worth it when the project grows.
+
+---
+
+Now we need to build the images again because files changed, so we run:
+
+```bash
+mvn compile jib:dockerBuild
+```
+
+We already have the images built (see image below: ![img\_11.png](img_11.png)).
+
+Now we want to push them to Docker Hub:
+
+```bash
+docker image push docker.io/treladev/accounts:s6
+```
+
+We can now run docker-compose and see how it works.
+
+---
+
+We can also create profiles for **prod** and **qa**:
+
+![img\_12.png](img_12.png)
+
+---
+
+We need to actually change one thing, namely the profile:
+
+For production:
+
+```yaml
+environment:
+  SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+  SPRING_PROFILES_ACTIVE: prod
+```
+
+For QA:
+
+```yaml
+environment:
+  SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+  SPRING_PROFILES_ACTIVE: qa
+```
+
+Thanks to this, we create docker-compose setups for production, default, and QA and can use them in each environment as needed.
+
+![img\_13.png](img_13.png)
+

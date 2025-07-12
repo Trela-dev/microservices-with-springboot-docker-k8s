@@ -1,0 +1,12 @@
+build:
+  version: "4.0"
+
+
+cards:
+  message: "Welcome to TrelaBank cards related QA APIs"
+  contactDetails:
+    name: "Example QA Contact"
+    email: "example.qa.contact@gmail.com"
+  onCallSupport:
+    - (123) 456-7890
+    - (123) 523-7890
