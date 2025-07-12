@@ -1,0 +1,31 @@
+#Separation of common configs from docker-compose
+services:
+  #All services
+  network-deploy-service:
+    networks:
+      - trelabank
+  #All services beside rabbit
+
+  microservice-base-config:
+    extends:
+      service: network-deploy-service
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+
+
+  microservice-configserver-config:
+    extends:
+      service: microservice-base-config
+    depends_on:
+      configserver:
+          condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      SPRING_PROFILES_ACTIVE: default
+
+
+
