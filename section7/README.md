@@ -1,6 +1,6 @@
 ---
 
-# Section 7:  Usign MYSQL Database inside microservices
+# Section 7:  Using MYSQL Database inside microservices
 
 ## Overview
 
