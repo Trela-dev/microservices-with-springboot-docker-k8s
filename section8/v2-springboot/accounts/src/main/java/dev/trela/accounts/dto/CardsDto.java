@@ -1,9 +1,10 @@
-package dev.trela.cards.dto;
+package dev.trela.accounts.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+
 @Schema(
         name = "Cards",
         description = "Schema to hold Account Information"
