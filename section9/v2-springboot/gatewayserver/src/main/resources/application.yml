@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: gatewayserver
+  config:
+    #    optional is given when we someteime dont need config server
+    import: "optional:configserver:http://localhost:8071/"
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false
+              lowerCaseServiceId: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  #allow everyone to shutdown app (not recommended for production)
+  endpoint:
+    gateway:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: gatewayserver
+    description: Trela Bank Gateway Server Application
+    version: 1.0.
+
+
+logging:
+  level:
+    dev:
+      trela:
+        gatewayserver: DEBUG
