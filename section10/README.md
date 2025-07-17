@@ -1407,28 +1407,40 @@ rada jest taka że lepiej nie używać wszystkich patternów na raz to będzie j
 i mozesz dostac wiele niespodzianek bez wlasciwego przetestowania uzywaj tylko tych potrzebnych\
 
 ---
-okej zróbmy teraz docker images wszystkich obrazow ~~~~
-screen ponizej z dockera
-![img_15.png](img_15.png)
 
-teraz musimy zrobic docker compose
+Okay, now let’s do `docker images` to list all images.
+(Screenshot from Docker below)
 
-aplikujemy redis w taki sposób pod spodem
+![img\_15.png](img_15.png)
 
+Now we need to create a `docker-compose`.
+
+We apply Redis like this below:
+
+```yaml
 redis:
-image: redis
-ports:
-- "6379:6379"
-healthcheck:
-test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-timeout: 10s
-retries: 10
-extends:
-file: common-config.yml
-service: microservice-base-config
+  image: redis
+  ports:
+    - "6379:6379"
+  healthcheck:
+    test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+    timeout: 10s
+    retries: 10
+  extends:
+    file: common-config.yml
+    service: microservice-base-config
+```
 
-i równiez musmy dodac do gateway dependencje redisa
-      redis:
-        condition: service_healthy
+And we also need to add Redis as a dependency to the gateway:
 
-i musimy dodac enviromend dotyczace redisa do gateway 
+```yaml
+  redis:
+    condition: service_healthy
+```
+And we need to add the Redis-related environment variables to the gateway.
+
+    environment:
+      SPRING_DATA_REDIS_CONNECT-TIMEOUT: 2s
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_TIMEOUT: 1S
