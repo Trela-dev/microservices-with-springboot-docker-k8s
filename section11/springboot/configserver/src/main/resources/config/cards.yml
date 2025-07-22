@@ -1,0 +1,11 @@
+build:
+  version: "3.0"
+
+cards:
+    message: "Welcome to TrelaBank cards related local APIs"
+    contactDetails:
+      name: "Marcin Trela Developer"
+      email: "marcin.trela.dev@gmail.com"
+    onCallSupport:
+      - (123) 456-7890
+      - (123) 523-7890

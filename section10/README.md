@@ -1,6 +1,6 @@
 ---
 
-# Section 9: Making microservices Resilient
+# Section 10: Making microservices Resilient
 
 ---
 
