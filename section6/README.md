@@ -763,4 +763,3 @@ environment:
 Thanks to this, we create docker-compose setups for production, default, and QA and can use them in each environment as needed.
 
 ![img\_13.png](img_13.png)
-
