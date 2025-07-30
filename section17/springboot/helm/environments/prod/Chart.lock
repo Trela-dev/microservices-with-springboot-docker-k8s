@@ -1,0 +1,24 @@
+dependencies:
+- name: trelabank-common
+  repository: file://../../trelabank-common
+  version: 0.1.0
+- name: configserver
+  repository: file://../../trelabank-services/configserver
+  version: 0.1.0
+- name: accounts
+  repository: file://../../trelabank-services/accounts
+  version: 0.1.0
+- name: cards
+  repository: file://../../trelabank-services/cards
+  version: 0.1.0
+- name: loans
+  repository: file://../../trelabank-services/loans
+  version: 0.1.0
+- name: gatewayserver
+  repository: file://../../trelabank-services/gateway
+  version: 0.1.0
+- name: message
+  repository: file://../../trelabank-services/message
+  version: 0.1.0
+digest: sha256:afd9a1c56c9e9f162705da56d63b1e933cfb54ee5c285266e83067320d702e79
+generated: "2025-07-30T12:25:56.5882411+02:00"

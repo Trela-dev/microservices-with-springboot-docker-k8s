@@ -1,0 +1,6 @@
+dependencies:
+- name: trelabank-common
+  repository: file://../../trelabank-common
+  version: 0.1.0
+digest: sha256:aaf135c891782d22d3ffba4a3f2a1140d6a025d6c5a5d333d38cfaf77ce5874e
+generated: "2025-07-26T15:51:11.5813587+02:00"
