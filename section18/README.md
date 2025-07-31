@@ -1,6 +1,7 @@
 ---
 
 # Section 18: Deploying microservices into cloud Kubernetes cluster
+
 ---
 
 So far, we have deployed our microservices to a local Kubernetes cluster.
