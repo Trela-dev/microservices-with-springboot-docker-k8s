@@ -566,6 +566,380 @@ This confirms that our BOM setup didn’t break anything and that the microservi
 
 ---
 
-Czasem też developerzy piszą zduplikowany kod w wielu mikroserwisach
-np mamy naprzyklad 
-ErrorResponseDto
+Sometimes developers write duplicated code across many microservices.
+For example, we might have something like:
+`ErrorResponseDto`
+
+When we build shared dependencies, there are different approaches.
+
+---
+
+### 1. The first approach is to create a shared Maven project
+
+which contains all the common dependencies.
+
+---
+
+🧱 **In `shared` create your classes**
+After creating the project, navigate to the directory:
+
+```
+shared/
+├── pom.xml
+└── src/
+    └── main/
+        └── java/
+            └── com/
+                └── example/
+                    └── shared/
+                        └── dto/
+                            └── UserDto.java
+```
+
+Example `UserDto.java`:
+
+```java
+package com.example.shared.dto;
+
+public class UserDto {
+    private String username;
+    private String email;
+
+    public UserDto(String username, String email) {
+        this.username = username;
+        this.email = email;
+    }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+}
+```
+
+---
+
+🧾 **Check the `pom.xml`**
+Make sure your `pom.xml` looks like this:
+
+```xml
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.example.shared</groupId>
+  <artifactId>shared</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>shared</name>
+</project>
+```
+
+---
+
+🏗️ **Build the library**
+In the terminal (in the `shared` directory), run:
+
+```bash
+mvn clean install
+```
+
+This will create a `.jar` file and install it into your local Maven repository (`~/.m2/repository`).
+
+---
+
+If we use this approach, the library becomes a big fat jar.
+If a service needs only one dependency,
+for example, utilities, security, logging are all inside,
+and say the service only needs utilities, it still has to carry security and logging —
+which is too much!
+
+---
+
+### 2. Another approach
+
+is to split one shared project into smaller ones,
+which reduces carrying unnecessary dependencies,
+but the downside is you might have 20 or 30 different Maven projects.
+
+---
+
+### 3. The third approach: multi-module projects
+
+This is a Maven project consisting of many submodules, each with its own `pom.xml`, but sharing the same parent `pom.xml`.
+It can be used to share code between services without duplication.
+Inside the parent POM, we can create a multi-module Maven project.
+
+---
+
+### 🔗 How do parent and child work in multi-module Maven?
+
+🔸 **Parent `pom.xml` (the main one on top):**
+Contains:
+
+* Common settings (e.g. Java version, encoding)
+* Plugins (e.g. `maven-compiler-plugin`)
+* Optionally: common dependencies (but they are not added automatically!)
+* List of modules (`<modules>`)
+
+❗ But dependencies declared in the parent are *not* automatically inherited as imports in the code — they are only available if declared in `dependencyManagement`.
+
+---
+
+🔸 **Child `pom.xml` (e.g. `service-a/pom.xml`)**
+Has `<parent>`, meaning: "I inherit configuration from the parent".
+
+But: it must declare dependencies it needs by itself.
+
+---
+
+### It’s simply one main project (parent) containing several smaller projects (modules).
+
+Imagine it like this:
+
+```
+/my-app (this is the root/parent project)
+│
+├── pom.xml              ← main POM (parent)
+│
+├── shared               ← submodule with DTOs, utilities, etc.
+│   └── pom.xml
+│
+├── service-a            ← service A
+│   └── pom.xml
+│
+└── service-b            ← service B
+    └── pom.xml
+```
+
+---
+
+### 🧠 What does it give you?
+
+* Each module (e.g. `shared`, `service-a`, `service-b`) is a separate Maven project.
+* But all share the same parent POM — so they have the same Java version, dependencies, configuration, etc.
+* Thanks to that you can:
+
+  * Build everything at once with `mvn clean install`
+  * Share code between modules without publishing JARs to `.m2`
+  * Avoid duplication (e.g. no need to install `shared` with DTOs separately)
+
+---
+
+Actually, the choice between these approaches varies among developers,
+and we should decide logically according to our project’s specifics.
+
+---
+
+**We will use the third approach.**
+
+---
+
+**How to do it?**
+
+First, we create a submodule for `trela-bom`
+![img\_4.png](img_4.png)
+We add it into the `trela-bom` project.
+
+Now, in the `pom.xml` of the BOM project,
+
+we create a `common` module:
+
+```xml
+<modules>
+    <module>common</module>
+</modules>
+```
+
+—that is, the module we created earlier.
+
+---
+
+Now, in the `common/pom.xml`,
+
+we remove the existing `<parent>` section and add the BOM parent:
+
+```xml
+<parent>
+    <groupId>dev.trela</groupId>
+    <artifactId>trela-bom</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
+</parent>
+```
+
+---
+
+Besides that, in the BOM project we add a property with the version for `common-lib.version`.
+
+We remove existing properties from `common/pom.xml`.
+
+We add `springdoc` dependency:
+
+```xml
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>${spring-doc.version}</version>
+</dependency>
+```
+
+We can also remove the entire `<build>` section from `common/pom.xml` since it inherits everything from the BOM.
+
+---
+
+Now we take the `ErrorResponseDto` class from a microservice and move it into the `common` module.
+
+In `common`, we remove the class with the `main` method,
+create a new package `dto`,
+and paste our `ErrorResponseDto` there.
+
+![img\_5.png](img_5.png)
+
+---
+
+Next, we remove `ErrorResponseDto` from each of our microservices.
+
+---
+
+If we now try to run a microservice, we will get a compilation error because it needs that class.
+
+What should the microservices do now?
+They need to add a dependency on `common` in each microservice:
+
+```xml
+<dependency>
+    <groupId>dev.trela</groupId>
+    <artifactId>common</artifactId>
+    <version>${common.lib.version}</version>
+</dependency>
+```
+
+---
+
+And now everything works — dependencies are resolved from our BOM, which the microservices’ POMs inherit from!
+
+Example import in code:
+
+```java
+import dev.trela.common.dto.ErrorResponseDto;
+```
+
+---
+
+This section introduces Maven BOMs (Bill of Materials) as a best practice for managing dependencies in microservices architectures, addressing the challenges of hardcoding versions across multiple services.
+
+Here's a breakdown of the key concepts and steps:
+
+The Problem: Hardcoded Versions
+Duplication: Configuration properties and dependency versions (like Java, Spring Cloud, OpenTelemetry) are repeated across pom.xml files in every microservice.
+
+Maintenance Nightmare: Upgrading a version requires manual updates in every single microservice, which is impractical for large organizations.
+
+The Solution: Maven BOM (Bill of Materials)
+A BOM is a special pom.xml file that provides a central place to define dependency versions.
+
+It ensures version consistency, simplifies dependency management, and makes it easy to upgrade libraries across all services from one place.
+
+A BOM is defined by <packaging>pom</packaging> and primarily uses a <dependencyManagement> block to declare versions, rather than direct <dependencies>.
+
+Adapting a BOM to Your Project (trela-bom)
+Create a New Maven Project for the BOM:
+
+Start with an empty Spring Boot project.
+
+Delete the src folder as it won't contain source code.
+
+Remove the <parent> tag from the initial pom.xml.
+
+Add metadata like licenses, developers, and SCM information.
+
+Set <packaging>pom</packaging>.
+
+Remove the <properties> section and instead define shared properties within the BOM for consistency.
+
+Define Shared Properties: Centralize versions for Java, Spring Boot, Spring Cloud, OpenTelemetry, Micrometer, Jib, and other common libraries.
+
+Add <dependencyManagement> Block:
+
+Import core BOMs like spring-boot-dependencies and spring-cloud-dependencies using <type>pom</type> and <scope>import</scope>. This tells Maven to "use these versions if a dependency is declared."
+
+Explicitly define versions for third-party dependencies not managed by Spring Boot's own BOM (e.g., H2, Lombok, SpringDoc, Micrometer) to ensure control and stability.
+
+Integrating trela-bom into Microservices
+Replace Parent POM: In each microservice's pom.xml (e.g., accounts), replace the spring-boot-starter-parent with your custom trela-bom:
+
+XML
+
+<parent>
+  <groupId>dev.trela</groupId>
+  <artifactId>trela-bom</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <relativePath>../trela-bom/pom.xml</relativePath>
+</parent>
+Remove Redundant Properties: Delete the <properties> section from microservices as versions are now centrally managed by the BOM.
+
+Declare Dependencies Without Versions: Microservices still need to declare the dependencies they use, but without specifying versions. Maven will infer the versions from the imported BOM.
+
+Overriding Versions: If a specific microservice needs a different version of a dependency than defined in the BOM, you can locally override it in that microservice's pom.xml. Maven will prioritize the locally declared version.
+
+Shared Dependencies: Common dependencies used by all microservices (e.g., spring-boot-starter-test) can be moved into the dependencyManagement section of the BOM. Microservices simply declare the dependency without a version, and the BOM provides it.
+
+Verify with Docker Builds: Confirm that the BOM setup doesn't break the Docker image build process using mvn compile jib:dockerBuild.
+
+Managing Shared Code/Dependencies Beyond Versions
+The section then explores different approaches to sharing code and non-version dependencies across microservices:
+
+Big Shared Maven Project:
+
+Create a single shared Maven project (packaging jar) containing all common classes (e.g., DTOs).
+
+Microservices declare this shared project as a dependency.
+
+Downside: This creates a "big fat JAR" where services carry unnecessary dependencies if they only need a small part.
+
+Split Shared Projects:
+
+Break the shared project into smaller, granular projects (e.g., shared-utilities, shared-security).
+
+Downside: Leads to many small Maven projects, increasing complexity.
+
+Multi-Module Projects (Chosen Approach):
+
+A single parent Maven project containing multiple submodules, each with its own pom.xml but sharing the parent's configuration.
+
+Benefits:
+
+Builds everything at once (mvn clean install).
+
+Shares code between modules without publishing JARs to the local Maven repository.
+
+Avoids duplication.
+
+Implementing Multi-Module Shared Code
+Create a common Submodule: Add a new module named common inside the trela-bom project.
+
+Update trela-bom/pom.xml: Add <module>common</module> to the <modules> section.
+
+Configure common/pom.xml:
+
+Set its parent to trela-bom.
+
+Remove its own <properties> and <build> sections, as they are inherited.
+
+Move Shared Code: Relocate common classes (e.g., ErrorResponseDto) from microservices into the common module.
+
+Add common Dependency to Microservices: Each microservice needing the shared code will add a dependency to common, leveraging the version defined in trela-bom:
+
+XML
+
+<dependency>
+  <groupId>dev.trela</groupId>
+  <artifactId>common</artifactId>
+  <version>${common.lib.version}</version>
+</dependency>
+This approach centralizes both dependency versions and shared code, making maintenance and upgrades significantly easier in a microservices environment.

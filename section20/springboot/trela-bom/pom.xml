@@ -42,6 +42,11 @@
 		<jib.version>3.4.2</jib.version>
 		<image.tag>s20</image.tag>
 	</properties>
+
+	<modules>
+		<module>common</module>
+	</modules>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

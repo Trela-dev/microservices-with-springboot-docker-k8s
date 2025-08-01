@@ -90,6 +90,12 @@
 			<version>${otel.version}</version>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>dev.trela</groupId>
+			<artifactId>common</artifactId>
+			<version>${common.lib.version}</version>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>

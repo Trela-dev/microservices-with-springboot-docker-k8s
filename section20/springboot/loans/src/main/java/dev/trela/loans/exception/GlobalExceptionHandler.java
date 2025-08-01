@@ -1,6 +1,7 @@
 package dev.trela.loans.exception;
 
-import dev.trela.loans.dto.ErrorResponseDto;
+
+import dev.trela.common.dto.ErrorResponseDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
