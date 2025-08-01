@@ -2,7 +2,7 @@
 This repository contains **everything completed as part of a Udemy course**:
 👉 [Course Certificate & Link](https://www.udemy.com/certificate/UC-af2973d6-3393-4be0-adaa-ebd877714a38/)
 
-The course lasted **40.5 hours** and I completed it in its entirety.
+The course lasted **40.5 hours** 
 
 Below is a **summary of the course sections**.
 Each section includes a **very detailed `README.md` file**, describing:
